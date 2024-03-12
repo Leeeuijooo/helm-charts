@@ -50,7 +50,7 @@ configmapReload:
   prometheus:
     ## If false, the configmap-reload container will not be deployed
     ##
-    enabled: false
+    enabled: true
 
     ## configmap-reload container name
     ##
@@ -373,7 +373,7 @@ server:
   strategy:
     type: Recreate
 
-  ## hostAliases allows adding entries to /etc/hosts inside the container
+  ## hostAliases allows adding entries to /etc/hosts inside the containers
   hostAliases: []
   #   - ip: "127.0.0.1"
   #     hostnames:
@@ -396,6 +396,18 @@ server:
   ## Pod affinity
   ##
   affinity: {}
+
+  ## Pod anti-affinity can prevent the scheduler from placing Prometheus server replicas on the same node.
+  ## The value "soft" means that the scheduler should *prefer* to not schedule two replica pods onto the same node but no guarantee is provided.
+  ## The value "hard" means that the scheduler is *required* to not schedule two replica pods onto the same node.
+  ## The default value "" will disable pod anti-affinity so that no anti-affinity rules will be configured (unless set in `server.affinity`).
+  ##
+  podAntiAffinity: ""
+
+  ## If anti-affinity is enabled sets the topologyKey to use for anti-affinity.
+  ## This can be changed to, for example, failure-domain.beta.kubernetes.io/zone
+  ##
+  podAntiAffinityTopologyKey: kubernetes.io/hostname
 
   ## Pod topology spread constraints
   ## ref. https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
@@ -433,7 +445,7 @@ server:
     ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
     ##
     accessModes:
-      - ReadWriteMany
+      - ReadWriteOnce
 
     ## Prometheus server data Persistent Volume labels
     ##
@@ -454,7 +466,7 @@ server:
 
     ## Prometheus server data Persistent Volume size
     ##
-    size: 1200Gi
+    size: 8Gi
 
     ## Prometheus server data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
@@ -463,7 +475,7 @@ server:
     ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
     ##   GKE, AWS & OpenStack)
     ##
-    storageClassName: "prometheus-storage"
+    # storageClass: "-"
 
     ## Prometheus server data Persistent Volume Binding Mode
     ## If defined, volumeBindingMode: <volumeBindingMode>
@@ -490,7 +502,7 @@ server:
     ## Persistent Volume Name
     ## Useful if Persistent Volumes have been provisioned in advance and you want to use a specific one
     ##
-    volumeName: s3-pv
+    # volumeName: ""
 
   emptyDir:
     ## Prometheus server emptyDir volume size limit
@@ -669,7 +681,7 @@ server:
     loadBalancerSourceRanges: []
     servicePort: 80
     sessionAffinity: None
-    type: LoadBalancer
+    type: ClusterIP
 
     ## Enable gRPC port on service to allow auto discovery with thanos-querier
     gRPC:
@@ -1211,7 +1223,7 @@ extraManifests: []
 alertmanager:
   ## If false, alertmanager will not be installed
   ##
-  enabled: false
+  enabled: true
 
   persistence:
     size: 2Gi
