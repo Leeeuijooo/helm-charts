@@ -668,7 +668,8 @@ server:
     ##
     enabled: true
 
-    annotations: {}
+    annotations: {
+      service.beta.kubernetes.io/aws-load-balancer-internal: "false"}
     labels: {}
     clusterIP: ""
 
